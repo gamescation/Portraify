@@ -1,0 +1,72 @@
+import { View, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import {Picker} from '@react-native-picker/picker';
+import { NATIONALITIES } from './constants';
+import { Txt } from '../Txt';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        width: 150,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    btn: {
+        opacity: 0.85,
+    },
+    maleBtn: {
+        borderColor: "blue",
+        borderWidth: 1,
+        backgroundColor: "blue"
+    },
+    activeMaleBtn: {
+        borderWidth: 2,
+        opacity: 1
+    },
+    femaleBtn: {
+        borderColor: "pink",
+        borderWidth: 1,
+        backgroundColor: "pink"
+    },
+    activeFemaleBtn: {
+        borderWidth: 2,
+        opacity: 1
+    }
+})
+
+interface Type {
+    name: string
+}
+
+const TypeSelector = ({ type, types, onSelect, defaultValue = '' }: { type: string, types: Type[], defaultValue: string, onSelect: (type: string) => void }) => {
+    const [value, setValue] = useState(defaultValue); // Default
+
+    useEffect(() => {
+        AsyncStorage.getItem(type, (error, result) => {
+            if (result) {
+                setValue(result);
+            }
+        })
+    }, []);
+
+    const selectValue = useCallback((value: string) => {
+        setValue(value);
+        onSelect(value);
+        AsyncStorage.setItem(value, value);
+    }, [value]);
+
+    return (
+        <Picker
+        selectedValue={value}
+        onValueChange={(itemValue) => {
+            selectValue(itemValue);
+            }}>
+                {types.map((type) => {
+                    return <Picker.Item key={type.name} label={type.name} value={type.name} color="white" />
+                })}
+        </Picker>
+    );
+};
+
+export default TypeSelector;

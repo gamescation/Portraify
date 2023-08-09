@@ -1,0 +1,1 @@
+export const networkError = "Oops! Connection hiccup";
