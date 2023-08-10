@@ -6,8 +6,10 @@
  */
 import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  PermissionsAndroid,
+  Platform,
   StyleSheet,
 } from 'react-native';
 import HomeScreen from './src/screens/HomeScreen';
@@ -17,15 +19,36 @@ import LibraryScreen from './src/screens/LibraryScreen';
 import { registerDevice } from './src/hooks/devices/registerDevice';
 import QueuedScreen from './src/screens/QueuedScreen';
 import ImageSelectionScreen from './src/screens/ImageSelectionScreen';
+import SplashScreen from './src/screens/SplashScreen';
 
 
 const Stack = createStackNavigator();
 
 function App(): JSX.Element {
-  // this will likely be required for android
-  // await PermissionsAndroid.request();
+  const [showSplash, setShowSplash] = useState(true);
+  const token = registerDevice();
 
-  registerDevice();
+  useEffect(() => {
+    if (token?.t) {
+      setShowSplash(false);
+    }
+  }, [token?.t]);
+  
+  // this will likely be required for android
+  const loadData = useCallback(async() => {
+    console.log(`Platform.OS: ${Platform.OS}`);
+    if (Platform.OS === 'android') {
+      await PermissionsAndroid.request();
+    } 
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [])
+
+  if (showSplash) {
+    return (<SplashScreen error={token?.error}></SplashScreen>);
+  }
 
   return (
     <NavigationContainer>

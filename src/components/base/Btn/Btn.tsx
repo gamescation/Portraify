@@ -21,13 +21,15 @@ const styles = StyleSheet.create({
         color: "white",
         textAlign: 'center',
         zIndex: 1,
+        fontWeight: '800',
+        textTransform: 'uppercase'
     },
     overlay: {
         position: 'absolute',
         width: 175,
         height: 44,
         backgroundColor: primaryColor,
-        opacity: 0.6,
+        opacity: 1,
         top: 5,
         left: 12,
         borderRadius: 4,
@@ -43,6 +45,7 @@ const styles = StyleSheet.create({
 interface BtnProps extends TouchableOpacityProps {
     size?: Size
     outline?: boolean
+    overlay?: boolean
 }
 
 const ANIMATION_DURATION = 1000;
@@ -62,7 +65,7 @@ export function Btn(props?: BtnProps): JSX.Element {
         <Animated.View style={[{ opacity: fadeAnim }, props?.style ? props.style: null]}>
             <TouchableOpacity {...props} style={[styles.btn, props?.style]}>
                 <Txt style={styles.txt} size={props?.size}>{props?.children || DEFAULT_TITLE}</Txt>
-                <View style={[styles.overlay, props?.style?.width ? { width: (props?.style?.width || 200) - 25 } : {}]}></View>
+                {props?.overlay && <View style={[styles.overlay, props.overlayStyle, props?.style?.width ? { width: (props?.style?.width || 200) - 25 } : {}]}></View>}
             </TouchableOpacity>
         </Animated.View>
     )

@@ -9,16 +9,22 @@ import photoLibraryImage from '../../assets/images/photo-icons-transparent.png'
 import { BackgroundImage } from '../components/base/BackgroundImage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import getDimensionsAndOrientation from '../components/hooks/getDimensionsAndOrientation';
 
 const styles = StyleSheet.create({
   txt: {
     marginTop: 10
   },
   container: {
+    position: 'absolute',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0
   },
   headline: {
     marginTop: 100,
@@ -66,6 +72,7 @@ const styles = StyleSheet.create({
 
 const PhotoScreen = () => {
   const navigation = useNavigation();
+  const { dimensions } = getDimensionsAndOrientation();
 
   const takePhoto = useCallback(async() => {
     let options = {
@@ -124,7 +131,7 @@ const PhotoScreen = () => {
     <View style={styles.container}>
         <BackgroundImage style={styles.backgroundImage} sources={[backgroundImage]} />
         <>
-          <View style={styles.btnWrapper}>
+          <View style={[styles.btnWrapper, { top: dimensions.screenHeight / 2, height: dimensions.screenHeight / 2 }]}>
               <Txt style={styles.headline}>Portrait Time!</Txt>
               <Txt size={Size.L} style={styles.txt}>First, take a portrait photo of yourself</Txt>
               <TouchableOpacity onPress={takePhoto}><Image style={styles.photoBtn} source={takePhotoImage} /></TouchableOpacity>

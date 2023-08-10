@@ -1,5 +1,5 @@
 {
-  "name": "portraify",
+  "name": "Portraify",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -21,6 +21,9 @@
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
     "add": "^2.0.6",
+    "appcenter": "^5.0.0",
+    "appcenter-analytics": "^5.0.0",
+    "appcenter-crashes": "^5.0.0",
     "axios": "^1.4.0",
     "cloudinary-react": "^1.8.1",
     "dotenv": "^16.3.1",

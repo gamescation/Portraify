@@ -1,9 +1,8 @@
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 import {Picker} from '@react-native-picker/picker';
-import { NATIONALITIES } from './constants';
-import { Txt } from '../Txt';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const styles = StyleSheet.create({
     container: {
@@ -58,12 +57,13 @@ const TypeSelector = ({ type, types, onSelect, defaultValue = '' }: { type: stri
 
     return (
         <Picker
-        selectedValue={value}
-        onValueChange={(itemValue) => {
-            selectValue(itemValue);
+            selectedValue={value}
+            selectionColor={'white'}
+            onValueChange={(itemValue) => {
+                selectValue(itemValue);
             }}>
                 {types.map((type) => {
-                    return <Picker.Item key={type.name} label={type.name} value={type.name} color="white" />
+                    return <Picker.Item color="white" key={type.name} label={type.name} value={type.name}/>
                 })}
         </Picker>
     );

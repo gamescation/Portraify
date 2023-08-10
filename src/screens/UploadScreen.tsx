@@ -117,8 +117,8 @@ const UploadScreen = () => {
           {error && 
             (<View style={[styles.errorContainer, { top: dimensions.screenHeight / 2}]}>
               <Txt>Sorry, there was an error.</Txt>
-              <Btn onPress={navigation.goBack}>Cancel</Btn>
-              <Btn onPress={uploadToCloudinary}>Retry</Btn>
+              <Btn overlay onPress={navigation.goBack}>Cancel</Btn>
+              <Btn overlay onPress={uploadToCloudinary}>Retry</Btn>
             </View>)}
         </>
         <Banner />

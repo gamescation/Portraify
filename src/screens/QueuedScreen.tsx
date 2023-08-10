@@ -14,6 +14,7 @@ import TypeSelector from '../components/base/selector/TypeSelector';
 import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 import { getPlacement } from '../components/base/ads/getPlacement';
 import { InLine } from '../components/base/ads/InLine/InLineAd';
+import { Radius } from '../constants/radius';
 
 
 const styles = StyleSheet.create({
@@ -22,6 +23,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    paddingHorizontal: 50
   },
   queuedText: {
     color: "white",
@@ -46,11 +48,43 @@ const styles = StyleSheet.create({
     marginTop: 12
   },
   btnWrapper: {
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   interstitial: {
     position: 'absolute',
     zIndex: 10,
+  },
+  typeOverlay: {
+    position: 'absolute', 
+    left:0, 
+    right: 0, 
+    top: 0, 
+    bottom: 0, 
+    backgroundColor: '#1b1b1b', 
+    borderRadius: Radius.M
+  },
+  label: {
+    paddingLeft: 30,
+    textTransform: 'uppercase',
+    fontWeight: '800'
+  },
+  selectorContainer: {
+    paddingTop: 25,
+    width: '100%',
+    paddingBottom: 10,
+    marginTop: 5,
+    opacity: 0.9
+  },
+  inputContainer: {
+    position: 'absolute', 
+    top: 0,
+    alignItems: 'center',
+    flexDirection: 'column'
+  },
+  btn: {
+  },
+  startBtnOverlay: {
+    backgroundColor: 'orange'
   }
 })
 
@@ -103,8 +137,6 @@ const types = [{
   name: "Abstract"
 }, {
   name: "Barbie"
-}, {
-  name: "Oppenheimer"
 }];
 
 const QueuedScreen = () => {
@@ -168,10 +200,29 @@ const QueuedScreen = () => {
             navigation.replace('ImageSelection', { secure_url, imageId: message?.id });
           }
         }
-       
       });
     }
   }, [subscribed, channel_id, navigation, isLoaded, hasSeenAd]);
+
+
+  useEffect(() => {
+    if (queued) {
+      const interval = setInterval(async() => {
+        const userImageResult = await axios.post(`${checkImageUrl}`, {
+          t,
+          secure_url: image,
+          data: {
+            gender,
+            background,
+            type
+          }
+        });
+        console.log("userImageResult: ", userImageResult.data);
+        const userImageJson = userImageResult.data;
+        console.log("userImageJson.status: ", userImageJson.status);
+      }, 60000);
+    }
+  }, [queued]);
 
   useEffect(() => {
     if (disconnected) {
@@ -217,7 +268,10 @@ const QueuedScreen = () => {
       const userImageJson = userImageResult.data;
       console.log("userImageJson.status: ", userImageJson.status);
       setQueued(userImageJson.status);
-      show();
+
+      if (userImageJson.status) {
+        show();
+      }
     } catch(e) {
       setQueued(false);
     }
@@ -246,31 +300,32 @@ const QueuedScreen = () => {
 
           {!queued && 
           (
-            <View style={{position: 'absolute', top: 0}}>
-              <View style={{top: 20}}>
+            <View style={styles.inputContainer}>
+              <View style={[styles.selectorContainer, {top: 0}]}>
                 <MaleFemaleSelector onSelect={setGender} />
               </View>
-              <View style={{top: 40, left: 0, paddingTop: 25}}>
-                <View style={{position: 'absolute', left:0, right: 0, top: 0, bottom: 0, backgroundColor: '#333', opacity: 0.5}}></View>
-                <Txt style={{paddingLeft: 30}}>Background</Txt>
+              <View style={styles.selectorContainer}>
+                <View style={styles.typeOverlay}></View>
+                <Txt style={styles.label}>Background</Txt>
                 <View>
                   <TypeSelector type="background"  onSelect={setBackground} types={backgrounds} defaultValue='Office' />
                 </View>
               </View>
-              <View style={{top: 50, left: 0, paddingTop: 25}}>
-                <View style={{position: 'absolute', left:0, right: 0, top: 0, bottom: 0, backgroundColor: '#333', opacity: 0.5}}></View>
-                <Txt style={{paddingLeft: 30}}>Portrait Type</Txt>
+              <View style={[styles.selectorContainer]}>
+                <View style={styles.typeOverlay}></View>
+                <Txt style={styles.label}>Portrait Type</Txt>
                 <View>
                   <TypeSelector type="types" onSelect={setType} types={types} defaultValue='Portrait' />
                 </View>
               </View>
+
+              <View style={[styles.btnWrapper]}>
+                <Btn overlay onPress={cancel} style={{width: dimensions.screenWidth / 2.5, left: -5}}>Cancel</Btn>
+                <Btn overlay onPress={enqueue} style={{width: dimensions.screenWidth / 2.5, right: -5}} overlayStyle={styles.startBtnOverlay}>Next</Btn>
+              </View>
             </View>
           )}
           
-          {!queued && (<View style={[styles.btnWrapper, { top: dimensions.screenHeight / 3}]}>
-            <Btn onPress={cancel}>Cancel</Btn>
-            <Btn onPress={enqueue}>Start</Btn>
-          </View>)}
 
           {!queued && <Banner />}
         </>

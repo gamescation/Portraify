@@ -104,7 +104,7 @@ const ImageSelectionScreen = () => {
           })}
         </>
         
-        {!loading && <Btn style={[styles.btn, { left: dimensions.screenWidth / 8}]} onPress={onNext}>Next</Btn>}
+        {!loading && <Btn overlay style={[styles.btn, { left: dimensions.screenWidth / 8}]} onPress={onNext}>Next</Btn>}
         <Banner />
     </View>
   );
