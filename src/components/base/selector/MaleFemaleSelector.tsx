@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
-import { Btn } from '../Btn';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import getDimensionsAndOrientation from '../../hooks/getDimensionsAndOrientation';
 import { TouchableOpacity } from 'react-native-gesture-handler';

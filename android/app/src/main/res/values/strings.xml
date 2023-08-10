@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Portraify</string>
+     <string moduleConfig="true" name="CodePushDeploymentKey">e1cd61bc-d3aa-44f3-a014-7c30d318313a</string>
 </resources>
