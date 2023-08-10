@@ -34,18 +34,6 @@ function App(): JSX.Element {
       setShowSplash(false);
     }
   }, [token?.t]);
-  
-  // this will likely be required for android
-  const loadData = useCallback(async() => {
-    console.log(`Platform.OS: ${Platform.OS}`);
-    if (Platform.OS === 'android') {
-      await PermissionsAndroid.request();
-    } 
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [])
 
   if (showSplash) {
     return (<SplashScreen error={token?.error}></SplashScreen>);

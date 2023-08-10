@@ -451,14 +451,6 @@ PODS:
   - react-native-admob-native-ads (0.6.6):
     - Google-Mobile-Ads-SDK
     - React-Core
-  - react-native-camera (4.2.1):
-    - React-Core
-    - react-native-camera/RCT (= 4.2.1)
-    - react-native-camera/RN (= 4.2.1)
-  - react-native-camera/RCT (4.2.1):
-    - React-Core
-  - react-native-camera/RN (4.2.1):
-    - React-Core
   - react-native-image-picker (5.6.0):
     - React-Core
   - react-native-netinfo (9.4.1):
@@ -656,7 +648,6 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-admob-native-ads (from `../node_modules/react-native-admob-native-ads`)
-  - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -771,8 +762,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-admob-native-ads:
     :path: "../node_modules/react-native-admob-native-ads"
-  react-native-camera:
-    :path: "../node_modules/react-native-camera"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-netinfo:
@@ -885,7 +874,6 @@ SPEC CHECKSUMS:
   React-jsinspector: b511447170f561157547bc0bef3f169663860be7
   React-logger: c5b527272d5f22eaa09bb3c3a690fee8f237ae95
   react-native-admob-native-ads: 97b6667c5d4d3e5a75baf264450dbb54ba53a181
-  react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
   react-native-image-picker: db60857e03d63721f19b6f4027de20429ddd9cba
   react-native-netinfo: fefd4e98d75cbdd6e85fc530f7111a8afdf2b0c5
   react-native-pager-view: 0ccb8bf60e2ebd38b1f3669fa3650ecce81db2df

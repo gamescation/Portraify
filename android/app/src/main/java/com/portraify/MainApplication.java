@@ -1,5 +1,4 @@
 package com.portraify;
-
 import android.app.Application;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -43,11 +42,11 @@ public class MainApplication extends Application implements ReactApplication {
         protected Boolean isHermesEnabled() {
           return BuildConfig.IS_HERMES_ENABLED;
         }
-        
-        @Override
-        protected String getJSBundleFile() {
-            return CodePush.getJSBundleFile();
-        }
+
+        // @Override
+        // protected String getJSBundleFile() {
+        //     return CodePush.getJSBundleFile();
+        // }
       };
 
   @Override
@@ -64,6 +63,5 @@ public class MainApplication extends Application implements ReactApplication {
       DefaultNewArchitectureEntryPoint.load();
     }
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-    AppCenter.start(getApplication(), "{Your App Secret}", Analytics.class, Crashes.class);
   }
 }
