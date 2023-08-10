@@ -34,6 +34,7 @@
     "react-native": "0.72.3",
     "react-native-admob-native-ads": "^0.6.6",
     "react-native-camera": "^4.2.1",
+    "react-native-code-push": "^8.0.2",
     "react-native-color": "^0.0.10",
     "react-native-device-info": "^10.8.0",
     "react-native-dotenv": "^3.4.9",

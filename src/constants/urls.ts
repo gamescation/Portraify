@@ -6,3 +6,4 @@ export const imageQueueUrl = `${baseUrl}/images/queue`
 export const userUrl = `${baseUrl}/user`;
 export const userImageUrl = `${baseUrl}/user/image`;
 export const userImagesUrl = `${baseUrl}/user/images`;
+export const checkImageUrl = `${baseUrl}/images/`

@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
   },
   btnWrapper: {
     flexDirection: 'row',
+    marginTop: 10
   },
   interstitial: {
     position: 'absolute',
@@ -69,11 +70,10 @@ const styles = StyleSheet.create({
     fontWeight: '800'
   },
   selectorContainer: {
-    paddingTop: 25,
+    paddingTop: 15,
     width: '100%',
-    paddingBottom: 10,
-    marginTop: 5,
-    opacity: 0.9
+    marginTop: 15,
+    opacity: 0.9,
   },
   inputContainer: {
     position: 'absolute', 

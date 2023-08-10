@@ -4,6 +4,7 @@
  *
  * @format
  */
+import codePush from "react-native-code-push";
 import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -88,4 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default __DEV__ ? App: codePush(App);
