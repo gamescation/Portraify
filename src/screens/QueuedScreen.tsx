@@ -205,24 +205,27 @@ const QueuedScreen = () => {
   }, [subscribed, channel_id, navigation, isLoaded, hasSeenAd]);
 
 
-  useEffect(() => {
-    if (queued) {
-      const interval = setInterval(async() => {
-        const userImageResult = await axios.post(`${checkImageUrl}`, {
-          t,
-          secure_url: image,
-          data: {
-            gender,
-            background,
-            type
-          }
-        });
-        console.log("userImageResult: ", userImageResult.data);
-        const userImageJson = userImageResult.data;
-        console.log("userImageJson.status: ", userImageJson.status);
-      }, 60000);
-    }
-  }, [queued]);
+  // useEffect(() => {
+  //   if (queued) {
+  //     const interval = setInterval(async() => {
+  //       const userImageResult = await axios.post(`${checkImageUrl}`, {
+  //         t,
+  //         secure_url: image,
+  //         data: {
+  //           gender,
+  //           background,
+  //           type
+  //         }
+  //       });
+  //       console.log("userImageResult: ", userImageResult.data);
+  //       const userImageJson = userImageResult.data;
+  //       console.log("userImageJson.status: ", userImageJson.status);
+  //     }, 60000);
+  //      return () => { 
+            // clearInterval(interval);
+          // }
+  //   }
+  // }, [queued]);
 
   useEffect(() => {
     if (disconnected) {

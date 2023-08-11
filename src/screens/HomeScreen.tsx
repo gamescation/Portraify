@@ -20,7 +20,7 @@ export function HomeScreen() {
     }, [navigation]);
     return (
         <FadeView loaded={loaded}>
-            {showLibrary ? (
+            {!showLibrary ? (
                 <LibraryScreen />
             ): (
                 <PhotoScreen />

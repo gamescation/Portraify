@@ -58,7 +58,6 @@ const TypeSelector = ({ type, types, onSelect, defaultValue = '' }: { type: stri
     return (
         <Picker
             selectedValue={value}
-            selectionColor={'white'}
             onValueChange={(itemValue) => {
                 selectValue(itemValue);
             }}>

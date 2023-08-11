@@ -16,8 +16,6 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   container: {
-    position: 'absolute',
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
@@ -55,6 +53,7 @@ const styles = StyleSheet.create({
     position: "absolute"
   },
   btnWrapper: {
+    marginTop: 100,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
@@ -130,15 +129,14 @@ const PhotoScreen = () => {
   return (
     <View style={styles.container}>
         <BackgroundImage style={styles.backgroundImage} sources={[backgroundImage]} />
-        <>
-          <View style={[styles.btnWrapper, { top: dimensions.screenHeight / 2, height: dimensions.screenHeight / 2 }]}>
-              <Txt style={styles.headline}>Portrait Time!</Txt>
-              <Txt size={Size.L} style={styles.txt}>First, take a portrait photo of yourself</Txt>
-              <TouchableOpacity onPress={takePhoto}><Image style={styles.photoBtn} source={takePhotoImage} /></TouchableOpacity>
-              <Txt size={Size.L} style={styles.txt}>or upload one</Txt>
-              <TouchableOpacity onPress={selectImage}><Image style={styles.photoBtn} source={photoLibraryImage} /></TouchableOpacity>
-          </View>
-        </>
+
+        <View style={[styles.btnWrapper]}>
+            <Txt style={styles.headline}>Portrait Time!</Txt>
+            <Txt size={Size.L} style={styles.txt}>First, take a portrait photo of yourself</Txt>
+            <TouchableOpacity onPress={takePhoto}><Image style={styles.photoBtn} source={takePhotoImage} /></TouchableOpacity>
+            <Txt size={Size.L} style={styles.txt}>or upload one</Txt>
+            <TouchableOpacity onPress={selectImage}><Image style={styles.photoBtn} source={photoLibraryImage} /></TouchableOpacity>
+        </View>
     </View>
   );
 };
