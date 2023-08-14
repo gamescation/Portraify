@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   },
   textWrapper: {
     backgroundColor: '#313131',
-    opacity: 0.85,
+    opacity: 0.65,
     width: '100%',
     paddingVertical: 10,
     zIndex: 1000
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 export const TxtBanner = (props) => {
     const { dimensions } = getDimensionsAndOrientation();
     return (
-        <View style={[styles.textWrapper, {top: dimensions.screenHeight / 5, width: dimensions.screenWidth }, props.style]}>
+        <View style={[styles.textWrapper, {top: props.top || dimensions.screenHeight / 5, width: dimensions.screenWidth }, props.style]}>
             <Txt style={styles.text}>{props.children}</Txt>
         </View>
     );

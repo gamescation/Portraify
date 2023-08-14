@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { getTrackingStatus } from "react-native-tracking-transparency";
 
 
-export function InLine(): JSX.Element {
+export function InLine({ wrapperStyle }): JSX.Element {
     const adToServe = getPlacement('admob', 'queuedpage');
     const adUnitId = __DEV__ ? TestIds.BANNER: adToServe;
     const height = 400;
@@ -28,14 +28,14 @@ export function InLine(): JSX.Element {
     }, []);
 
     const styles = StyleSheet.create({
-        inlineWrapper: {position: 'absolute', zIndex: 1000000, top: dimensions.screenHeight / 2.5, bottom: 0, height},
+        inlineWrapper: {position: 'absolute', zIndex: 1000000, top: dimensions.screenHeight - height - (dimensions.screenHeight / 100), height},
         inlineAd: {
             height, 
             width: dimensions.screenWidth
         }
     })
     return (
-        <FadeView style={styles.inlineWrapper} loaded={true}>
+        <FadeView style={[styles.inlineWrapper, wrapperStyle]} loaded={true}>
             <BannerAd
                 unitId={adUnitId}
                 size={BannerAdSize.MEDIUM_RECTANGLE}

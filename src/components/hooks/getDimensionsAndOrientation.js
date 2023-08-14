@@ -12,10 +12,7 @@ export default getDimensionsAndOrientation = () => {
         screenHeight: Dimensions.get('window').height,
         fullView: { 
             height: Dimensions.get('window').height, 
-            width: Dimensions.get('window').width, 
-            transform: [
-                {translateX: -(Dimensions.get('window').width / 2)}
-            ] 
+            width: Dimensions.get('window').width
     }
     });
     const [orientation, setOrientation] = React.useState(getOrientation());
@@ -27,10 +24,7 @@ export default getDimensionsAndOrientation = () => {
                 screenHeight: Dimensions.get('window').height,
                 fullView: { 
                     height: Dimensions.get('window').height, 
-                    width: Dimensions.get('window').width, 
-                    transform: [
-                        {translateX: -(Dimensions.get('window').width / 2)}
-                    ] 
+                    width: Dimensions.get('window').width
                 }
             });
             setOrientation(getOrientation(window.width, window.height));

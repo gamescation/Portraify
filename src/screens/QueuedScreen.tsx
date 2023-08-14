@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Txt } from '../components/base/Txt';
 import { subscribe, unsubscribe } from '../hooks/pusher';
@@ -15,12 +15,12 @@ import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 import { getPlacement } from '../components/base/ads/getPlacement';
 import { InLine } from '../components/base/ads/InLine/InLineAd';
 import { Radius } from '../constants/radius';
+import { makeRequest } from '../api/images/image-queue';
 
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
     paddingHorizontal: 50
@@ -88,62 +88,79 @@ const styles = StyleSheet.create({
   }
 })
 
-const backgrounds = [{
-  name: "Office"
-}, {
-  name: "Forest"
-}, {
-  name: "Desert"
-}, {
-  name: "Waterfall"
-}, {
-  name: "New York City"
-}, {
-  name: "San Francisco"
-}, {
-  name: "Hawaii"
-}, {
-  name: "Miami"
-}, {
-  name: "Paris"
-}, {
-  name: "Night Market"
-}, {
-  name: "Sunset"
-}, {
-  name: "Piano"
-}];
+const backgroundList = [
+  "Office", 
+  "Forest", 
+  "Desert", 
+  "Waterfall",
+  "New York City", 
+  "San Francisco", 
+  "Hawaii", 
+  "Miami",
+  "Paris", 
+  "Night Market",
+  "Nature Landscape",
+  "Urban Cityscape",
+  "Beach Sunset",
+  "Space Galaxy",
+  "Abstract Patterns",
+  "Vintage Texture",
+  "Watercolor Splash",
+  "Rustic Wood",
+  "Minimalistic",
+  "Floral Garden",
+  "Night Sky",
+  "Underwater Scene",
+  "Fantasy Realm",
+  "Vintage Paper",
+  "Gradients",
+  "Industrial Setting",
+  "Desert Dunes",
+  "Art Deco",
+  "Tropical Paradise",
+  "Sci-Fi Futuristic"
+]
 
-
-const types = [{
-  name: "Portrait"
-}, {
-  name: "Headshot"
-}, {
-  name: "Anime"
-}, {
-  name: "Graffiti"
-}, {
-  name: "Street"
-}, {
-  name: "Wild Life"
-}, {
-  name: "Food"
-}, {
-  name: "Travel"
-}, {
-  name: "Night Life"
-}, {
-  name: "Abstract"
-}, {
-  name: "Barbie"
-}];
+const typeList = [
+  "Portrait",
+  "Headshot",
+  "Anime",
+  "Graffiti",
+  "Street",
+  "Wild Life",
+  "Food",
+  "Travel",
+  "Night Life",
+  "Abstract",
+  "Barbie",
+  "Realism",
+  "Impressionism",
+  "Cubism",
+  "Surrealism",
+  "Minimalism",
+  "Pop Art",
+  "Expressionism",
+  "Caricature",
+  "Noir",
+  "Classic Portrait",
+  "Collage",
+  "Line Drawing",
+  "Digital Painting",
+  "Monochromatic",
+  "Mixed Media",
+  "Pointillism",
+  "Photorealism",
+  "Stylized",
+  "Mosaic"
+]
 
 const QueuedScreen = () => {
   const [queued, setQueued] = useState(false);
   const route = useRoute();
   const params = route.params || {};
-  const { image, channel_id } = params;
+  const { image: paramsImage, channel_id, previouslyQueued, imageId: paramsImageId } = params;
+
+  const [image] = useState(paramsImage || (previouslyQueued ? previouslyQueued.secure_url: ''));
   const [subscribed, setSubscribed] = useState(false);
   const [progress, setProgress] = useState('0%');
   const { dimensions } = getDimensionsAndOrientation();
@@ -153,7 +170,7 @@ const QueuedScreen = () => {
   const [ newImageUri, setImageUri ] = useState('');
   const navigation = useNavigation();
   const [hasSeenAd, setHasSeenAd] = useState(false);
-  const [imageId, setImageId] = useState();
+  const [imageId, setImageId] = useState(paramsImageId || previouslyQueued.id);
   const [disconnected, setDisconnected] = useState(false);
 
   const adToServe = getPlacement('admob', 'interstitial');
@@ -161,6 +178,40 @@ const QueuedScreen = () => {
   const { isLoaded, isClosed, load, show } = useInterstitialAd(adUnitId, {
     requestNonPersonalizedAdsOnly: true,
   });
+
+  const checkForUpdate = useCallback(async() => {
+      try { 
+        const result = await makeRequest({ body: {
+          imageId: imageId || previouslyQueued.id
+        } });
+
+        if (result) {
+          if (result.generating) {
+            if (result.progress) {
+              setProgress(result.progress);
+            }
+          } else if (result.complete) {
+            setProgress('100%');
+            const secure_url = result.secure_url;
+            setImageUri(secure_url);
+            setImageId(result.id);
+            console.log('secure_url: ', secure_url);
+            if (hasSeenAd || !isLoaded) {
+              return navigation.replace('ImageSelection', { secure_url, imageId: result.id, channel_id });
+            }
+          }
+        }
+      } catch(e) {
+        console.error(`Error while checking for an update ${e.message} ${e.stack}`);
+      }
+  }, [hasSeenAd, isLoaded, navigation, channel_id, imageId]);
+
+  const checkOnInterval = useCallback(() => {
+    return setInterval(async() => {
+      console.log("Checking for an update");
+      await checkForUpdate();
+    }, 60000);
+  }, []);
 
   useEffect(() => {
     // Start loading the interstitial straight away
@@ -171,61 +222,56 @@ const QueuedScreen = () => {
     if (isClosed) {
       // Action after the ad is closed
       setHasSeenAd(true);
-      if (parseInt(progress) >= 100 && newImageUri) {
-        console.log("using new image uri: ", newImageUri);
+      if (parseInt(progress) >= 100 && newImageUri && imageId) {
         navigation.replace('ImageSelection', { secure_url: newImageUri, imageId, channel_id });
       }
     }
   }, [isClosed, navigation, progress, newImageUri, imageId, channel_id]);
 
+
+  useEffect(() => {
+    if (subscribed || previouslyQueued) {
+      if(previouslyQueued) {
+        checkForUpdate();
+      }
+
+      const interval = checkOnInterval();
+
+      return () => {
+        if (interval) {
+          clearInterval(interval);
+        }
+      }
+    }
+  }, [subscribed, previouslyQueued]);
+
   const subscribeToChannel = useCallback(() => {
     if (!subscribed) {
       setSubscribed(true);
-      console.log("Subscribed to channel_id", channel_id);
-      subscribe(channel_id, (data) => {
-        const message = data.message;
-        console.log("Progress: ", message?.progress);
-        const prog = parseInt(message?.progress) || 0;
-        if (prog < 100) {
-          setProgress(message?.progress || 0);
-        } else if (prog >= 100) {
-          console.log("Complete");
-          const secure_url = message?.secure_url;
-          console.log("imageUri: ", secure_url);
-          setImageUri(secure_url);
-          setProgress(message?.progress); 
-          setImageId(message?.id)
-          if (hasSeenAd || !isLoaded) {
-            console.log('secure_url: ', secure_url);
-            navigation.replace('ImageSelection', { secure_url, imageId: message?.id });
+      if (channel_id) {
+        console.log("Subscribed to channel_id", channel_id);
+        subscribe(channel_id, (data) => {
+          const message = data.message;
+          console.log("Progress: ", message?.progress);
+          const prog = parseInt(message?.progress) || 0;
+          if (prog < 100) {
+            setProgress(message?.progress || 0);
+          } else if (prog >= 100) {
+            console.log("Complete");
+            const secure_url = message?.secure_url;
+            console.log("imageUri: ", secure_url);
+            setImageUri(secure_url);
+            setProgress(message?.progress); 
+            setImageId(message?.id)
+            if (hasSeenAd || !isLoaded) {
+              console.log('secure_url: ', secure_url);
+              navigation.replace('ImageSelection', { secure_url, imageId: message?.id, channel_id });
+            }
           }
-        }
-      });
+        });
+      }
     }
   }, [subscribed, channel_id, navigation, isLoaded, hasSeenAd]);
-
-
-  // useEffect(() => {
-  //   if (queued) {
-  //     const interval = setInterval(async() => {
-  //       const userImageResult = await axios.post(`${checkImageUrl}`, {
-  //         t,
-  //         secure_url: image,
-  //         data: {
-  //           gender,
-  //           background,
-  //           type
-  //         }
-  //       });
-  //       console.log("userImageResult: ", userImageResult.data);
-  //       const userImageJson = userImageResult.data;
-  //       console.log("userImageJson.status: ", userImageJson.status);
-  //     }, 60000);
-  //      return () => { 
-            // clearInterval(interval);
-          // }
-  //   }
-  // }, [queued]);
 
   useEffect(() => {
     if (disconnected) {
@@ -261,6 +307,7 @@ const QueuedScreen = () => {
       const userImageResult = await axios.post(`${imageQueueUrl}`, {
         t,
         secure_url: image,
+        imageId,
         data: {
           gender,
           background,
@@ -274,15 +321,28 @@ const QueuedScreen = () => {
 
       if (userImageJson.status) {
         show();
+      } else {
+        setSubscribed(false);
       }
     } catch(e) {
+      console.error(`Error queueing: ${e.message} ${e.stack}`);
       setQueued(false);
     }
-  }, [image, gender, background, type]);
+  }, [image, gender, background, type, imageId]);
 
-  const cancel = useCallback(() => {
+  const cancel = useCallback(async() => {
+    await AsyncStorage.removeItem('imageUploaded');
     navigation.popToTop();
   }, [navigation]);
+
+  const backgrounds = useMemo(() => {
+    return backgroundList.map((background) => { return { name: background }});
+  }, [])
+
+
+  const types = useMemo(() => {
+    return typeList.map((type) => { return { name: type } });
+  }, [])
   return (
     <View style={styles.container}>
         <>
@@ -298,7 +358,7 @@ const QueuedScreen = () => {
               <Txt style={styles.queuedText}>Creating other headshots</Txt>
               <Txt style={styles.queuedText}>Please wait</Txt>
             </>}
-            <InLine />
+            <InLine wrapperStyle={{top: dimensions.screenHeight - 550}} />
           </View>)}
 
           {!queued && 

@@ -28,8 +28,13 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         opacity: 0.5,
+        width: '100%',
         zIndex: 100,
         backgroundColor: '#111111',
+    },
+
+    view: {
+        flexDirection: 'column'
     }
 })
 

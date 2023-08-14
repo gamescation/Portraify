@@ -1,6 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * Portraify
  *
  * @format
  */
@@ -9,8 +8,6 @@ import { TransitionPresets, createStackNavigator } from '@react-navigation/stack
 import { NavigationContainer } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  PermissionsAndroid,
-  Platform,
   StyleSheet,
 } from 'react-native';
 import HomeScreen from './src/screens/HomeScreen';

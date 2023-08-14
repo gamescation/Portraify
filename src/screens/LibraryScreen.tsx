@@ -8,6 +8,7 @@ import { Btn } from '../components/base/Btn';
 import { Banner } from '../components/base/ads/Banner';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { subscribe, unsubscribe } from '../hooks/pusher';
+import LibraryImage from '../components/images/LibraryImage';
 
 
 const HEIGHT = 150;
@@ -74,7 +75,7 @@ const map = (data: any[], options = { key: 'id' }) => {
   return newData;
 }
 
-const LibraryScreen = () => {
+const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
   const [images, setImages] = useState({});
   const [image, setImage] = useState();
   const [subscribed, setSubscribed] = useState(false);
@@ -117,6 +118,7 @@ const LibraryScreen = () => {
           if (!image && Object.values(newImages).length) {
             const first = Object.values(newImages)[0];
             setImage(first);
+            onLoad();
           } else if (!images && Object.values(newImages).length === 0) {
             return navigation.reset({ 
               index: 0,
@@ -145,6 +147,9 @@ const LibraryScreen = () => {
       subscribe(channel_id, (data) => {
         const message = data.message;
         console.log("Upscaled: ", message);
+        navigation.setParams({
+          upscale: false
+        })
 
         setUpscaling(false);
         setImages({
@@ -191,14 +196,12 @@ const LibraryScreen = () => {
   return (
       <View style={[styles.container, { height: dimensions.screenHeight, width: dimensions.screenWidth }]}>
         <>
-          {loading && <TxtBanner>Loading...</TxtBanner>}
-          {!loading && upscaling && <TxtBanner>Upscaling...</TxtBanner>}
+          {loading && <TxtBanner top={dimensions.screenHeight / 2 - 25}>Loading...</TxtBanner>}
+          {!loading && upscaling && <TxtBanner top={dimensions.screenHeight / 2 - 50}>Upscaling Images...</TxtBanner>}
           {error && <TxtBanner>Error loading images</TxtBanner>}
           {error && <Btn overlay onPress={() => fetchPage(page)}>Retry</Btn>}
           {image && 
-            <View style={styles.imageWrapper}>
-              <Image style={styles.image} source={{uri: image.secure_url}} height={dimensions.screenHeight} width={dimensions.screenWidth} />
-            </View>}
+            <LibraryImage image={image} />}
         </>
 
         {values.length > 0 && (
@@ -206,7 +209,7 @@ const LibraryScreen = () => {
             <View style={styles.addWrapper}>
               <TouchableOpacity style={styles.add} onPress={() => {
                 navigation.navigate('Photo', {
-                  redirect: true
+                  inPage: true
                 })
               }}><Txt style={styles.addBtn}>+</Txt></TouchableOpacity>
             </View>

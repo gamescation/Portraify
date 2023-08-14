@@ -5,8 +5,8 @@ import getDimensionsAndOrientation from '../components/hooks/getDimensionsAndOri
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Btn } from '../components/base/Btn';
 import { TxtBanner } from '../components/base/TxtBanner';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeRequest } from '../api/user/image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const styles = StyleSheet.create({
     container: {
@@ -56,6 +56,18 @@ const ImageSelectionScreen = () => {
   }, [choices]);
 
   const onNext = useCallback(async() => {
+    const actualChoices = Object.keys(choices).map((choice) => {
+      return choices[choice];
+    }).filter((value) => value);
+
+    if (actualChoices.length === 0) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Library" }]
+      })
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await makeRequest({ body: {
@@ -63,7 +75,7 @@ const ImageSelectionScreen = () => {
         choices: Object.keys(choices).map((value) => parseInt(value))
       }})
       console.log('Result: ', result);
-      AsyncStorage.setItem('created', 'true');
+      await AsyncStorage.removeItem('imageUploaded');
       navigation.reset({
         index: 0,
         routes: [{ name: "Library", params: { connect: true, upscale: true} }]
@@ -82,7 +94,7 @@ const ImageSelectionScreen = () => {
         <>
           {error && <TxtBanner style={bannerStyle}>There's been an error. Please try again.</TxtBanner>}
           {loading ? (
-              <TxtBanner style={bannerStyle}>Starting Upscaling Task</TxtBanner>
+              <TxtBanner style={bannerStyle}>Starting Upscaling</TxtBanner>
           ): (<TxtBanner style={bannerStyle}>Tap the ones to keep</TxtBanner>)}
           <Image style={[styles.image, {top: offsetHeight}]} source={{ uri: secure_url }} height={dimensions.screenHeight} width={dimensions.screenWidth} />
           

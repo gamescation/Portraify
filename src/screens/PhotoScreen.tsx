@@ -8,7 +8,6 @@ import photoLibraryImage from '../../assets/images/photo-icons-transparent.png'
 
 import { BackgroundImage } from '../components/base/BackgroundImage';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import getDimensionsAndOrientation from '../components/hooks/getDimensionsAndOrientation';
 
 const styles = StyleSheet.create({
@@ -16,8 +15,7 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   container: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: 'absolute',
     backgroundColor: '#fff',
     left: 0,
     right: 0,
@@ -50,9 +48,16 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     zIndex: 0,
-    position: "absolute"
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0
   },
   btnWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 50,
+    zIndex: 10,
     marginTop: 100,
     alignItems: 'center',
     justifyContent: 'center',
@@ -62,15 +67,44 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     marginTop: 15,
-    marginBottom: 15
+    marginBottom: 15,
+    zIndex: 1000
   },
   image: {
     position: 'absolute',
+  },
+  disclaimer: {
+    position: 'absolute',
+    zIndex: 1,
+    flexWrap: 'wrap',
+    fontStyle: 'italic', 
+    padding: 30, 
+    textAlign: 'left'
+  },
+  disclaimerWrap: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  draggerContainer: {
+    top: 30,
+    height: 5,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  dragger: {
+    height: 5,
+    width: 50,
+    backgroundColor: 'white',
+    borderRadius: 1,
+    borderColor: 'white',
   }
 })
 
 const PhotoScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const { dimensions } = getDimensionsAndOrientation();
 
   const takePhoto = useCallback(async() => {
@@ -128,6 +162,7 @@ const PhotoScreen = () => {
 
   return (
     <View style={styles.container}>
+        {route.params?.inPage && <View style={styles.draggerContainer}><View style={styles.dragger}></View></View>}
         <BackgroundImage style={styles.backgroundImage} sources={[backgroundImage]} />
 
         <View style={[styles.btnWrapper]}>
@@ -136,6 +171,10 @@ const PhotoScreen = () => {
             <TouchableOpacity onPress={takePhoto}><Image style={styles.photoBtn} source={takePhotoImage} /></TouchableOpacity>
             <Txt size={Size.L} style={styles.txt}>or upload one</Txt>
             <TouchableOpacity onPress={selectImage}><Image style={styles.photoBtn} source={photoLibraryImage} /></TouchableOpacity>
+        </View>
+
+        <View style={[styles.disclaimerWrap, { top: dimensions.screenHeight - 200, width: dimensions.screenWidth }]}>
+          <Txt size={Size.M} style={[styles.disclaimer]}>Generated faces and images are not guaranteed to look like the source image. All images are provided "as-is" and solely for entertainment value.</Txt>
         </View>
     </View>
   );
