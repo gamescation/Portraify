@@ -42,7 +42,7 @@ export function HomeScreen() {
         });
     }, [navigation]);
     return (
-        <FadeView loaded={loaded}>
+        <FadeView loaded={true}>
             <View style={{position: 'absolute', top: 0}}>
                 {showLibrary ? (
                     <LibraryScreen onLoad={() => setLoaded(true)} />
