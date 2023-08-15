@@ -52,4 +52,4 @@ function App(): JSX.Element {
   );
 }
 
-export default __DEV__ ? App: codePush(App);
+export default __DEV__ ? App: codePush({  deploymentKey: 'x-M0k4Ngf1kiSfJXHaeimbCkMi3RVXJFv9v6x' }, App);

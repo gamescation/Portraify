@@ -85,6 +85,10 @@ const styles = StyleSheet.create({
   },
   startBtnOverlay: {
     backgroundColor: 'orange'
+  },
+  selectorContainerSmallScreen: {
+    paddingTop: 5,
+    marginTop: 5
   }
 })
 
@@ -316,9 +320,9 @@ const QueuedScreen = () => {
       });
       console.log("userImageResult: ", userImageResult.data);
       const userImageJson = userImageResult.data;
-      console.log("userImageJson.status: ", userImageJson.status);
+      console.log("userImageJson.status: ", userImageJson.status, userImageJson.success);
 
-      if (userImageJson.status) {
+      if (userImageJson.success) {
         setQueued(true);
         show();
       } else {
@@ -344,11 +348,13 @@ const QueuedScreen = () => {
   const types = useMemo(() => {
     return typeList.map((type) => { return { name: type } });
   }, [])
+
+  const smallScreen = dimensions.screenHeight < 700;
   return (
     <View style={styles.container}>
         <>
           {image && <Image style={styles.image} source={{ uri: image }} height={dimensions.screenHeight} width={dimensions.screenWidth} />}
-          {queued && (<View style={[styles.queuedTextWrapper, { top: dimensions.screenHeight / 7 }]}>
+          {queued && (<View style={[styles.queuedTextWrapper, { top: smallScreen ? 5: dimensions.screenHeight / 7 }]}>
             {parseInt(progress) > 0 ?
             <>
               <Txt style={styles.queuedText}>Creating Your Images</Txt>
@@ -365,20 +371,20 @@ const QueuedScreen = () => {
           {!queued && 
           (
             <View style={styles.inputContainer}>
-              <View style={[styles.selectorContainer, {top: 0}]}>
+              <View style={[styles.selectorContainer, {top: 0}, smallScreen && styles.selectorContainerSmallScreen]}>
                 <MaleFemaleSelector onSelect={setGender} />
               </View>
-              <View style={styles.selectorContainer}>
+              <View style={[styles.selectorContainer, smallScreen && styles.selectorContainerSmallScreen]}>
                 <View style={styles.typeOverlay}></View>
-                <Txt style={styles.label}>Background</Txt>
-                <View>
+                <Txt style={[styles.label, smallScreen && { fontSize: 8, marginTop: 2}]}>Background</Txt>
+                <View style={[smallScreen && { maxHeight: 175}]}>
                   <TypeSelector type="background"  onSelect={setBackground} types={backgrounds} defaultValue='Office' />
                 </View>
               </View>
               <View style={[styles.selectorContainer]}>
                 <View style={styles.typeOverlay}></View>
-                <Txt style={styles.label}>Portrait Type</Txt>
-                <View>
+                <Txt style={[styles.label, smallScreen && { fontSize: 8, marginTop: 2}]}>Portrait Type</Txt>
+                <View style={[smallScreen && { maxHeight: 170}]}>
                   <TypeSelector type="types" onSelect={setType} types={types} defaultValue='Portrait' />
                 </View>
               </View>

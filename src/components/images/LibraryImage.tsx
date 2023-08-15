@@ -55,7 +55,7 @@ export const LibraryImage = ({ image }) => {
         }, 3000);
     }, [image]);
 
-    const onShare= useCallback(async() => {
+    const onShare = useCallback(async() => {
         try {
             const options = {
               message: `Check out this image I made with Portraify (${Platform.OS})`,
