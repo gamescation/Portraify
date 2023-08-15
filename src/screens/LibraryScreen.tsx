@@ -108,8 +108,8 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
         if (len > 0) {
           const mappedResults = map(results.images);
           const newImages = {
+            ...mappedResults,
             ...images,
-            ...mappedResults
           }
 
           setImages(newImages);
@@ -153,12 +153,12 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
 
         setUpscaling(false);
         setImages({
+          ...images,
           [message?.id]: {
             secure_url: message.secure_url,
             id: message?.id,
             generated: true
           },
-          ...images,
         })
       });
     }
