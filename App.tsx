@@ -6,10 +6,7 @@
 import codePush from "react-native-code-push";
 import { TransitionPresets, createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  StyleSheet,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import HomeScreen from './src/screens/HomeScreen';
 import PhotoScreen from './src/screens/PhotoScreen';
 import UploadScreen from './src/screens/UploadScreen';
@@ -55,25 +52,4 @@ function App(): JSX.Element {
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default __DEV__ ? App: codePush({
-  deploymentKey: "x-M0k4Ngf1kiSfJXHaeimbCkMi3RVXJFv9v6x"
-}, App);
+export default __DEV__ ? App: codePush(App);

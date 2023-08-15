@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     bottom: 0
   },
   headline: {
-    marginTop: 100,
+    marginTop: 50,
     fontSize: 30,
     marginBottom: 15
   },
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   draggerContainer: {
-    top: 30,
+    top: 10,
     height: 5,
     width: '100%',
     alignItems: 'center',
@@ -173,8 +173,8 @@ const PhotoScreen = () => {
             <TouchableOpacity onPress={selectImage}><Image style={styles.photoBtn} source={photoLibraryImage} /></TouchableOpacity>
         </View>
 
-        <View style={[styles.disclaimerWrap, { top: dimensions.screenHeight - 200, width: dimensions.screenWidth }]}>
-          <Txt size={Size.M} style={[styles.disclaimer]}>Generated faces and images are not guaranteed to look like the source image. All images are provided "as-is" and solely for entertainment value.</Txt>
+        <View style={[styles.disclaimerWrap, { top: (dimensions.screenHeight * 8) / 10, width: dimensions.screenWidth }]}>
+          <Txt size={Size.S} style={[styles.disclaimer]}>Generated faces and images are may not look like the face in the source image. All images are provided "as-is" for entertainment purposes.</Txt>
         </View>
     </View>
   );

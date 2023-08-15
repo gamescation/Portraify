@@ -1,6 +1,6 @@
 {
-  "name": "Portraify",
-  "version": "0.0.1",
+  "name": "portraify",
+  "version": "1.0.15",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "CodePush:ios": "appcenter CodePush release-react -a gamescation/Portraify -d Production",
+    "CodePush:ios": "appcenter codepush release-react -a gamescation/Portraify -d Production",
     "CodePush:android": "appcenter CodePush release-react -a gamescation/Portraify -d Production"
   },
   "dependencies": {

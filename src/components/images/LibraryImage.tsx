@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faDownload } from '@fortawesome/free-solid-svg-icons/faDownload'
 import { faShare } from '@fortawesome/free-solid-svg-icons/faShare'
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons/faArrowUp'
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons/faArrowsRotate'
 import { useCallback, useState } from "react";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import Share from 'react-native-share';
@@ -52,7 +53,7 @@ export const LibraryImage = ({ image }) => {
         setTimeout(() => {
             setStatus('');
         }, 3000);
-    }, []);
+    }, [image]);
 
     const onShare= useCallback(async() => {
         try {
@@ -65,13 +66,24 @@ export const LibraryImage = ({ image }) => {
           } catch (error) {
             // console.error('Error sharing content:', error);
           }
-    }, []);
+    }, [image]);
+
+
+    const onGenerate = useCallback(async() => {
+        navigation.navigate('Queued', {
+            image: image.secure_url,
+            imageId: image.id,
+            secure_url: image.secure_url
+        })
+    }, [navigation, image]);
+
     const onUpscale = useCallback(async() => {
         navigation.navigate('ImageSelection', {
             imageId: image.id,
             secure_url: image.secure_url
         })
-    }, [navigation]);
+    }, [navigation, image]);
+
 
 
     return (
@@ -85,9 +97,13 @@ export const LibraryImage = ({ image }) => {
                     <TouchableOpacity style={styles.iconContainer} onPress={onShare}>
                         <FontAwesomeIcon icon={faShare} style={styles.icon} size={30} />
                     </TouchableOpacity>
-                    {image.generated && image.choices && (
+                    {image.generated && image.choices ? (
                         <TouchableOpacity style={styles.iconContainer} onPress={onUpscale}>
                             <FontAwesomeIcon icon={faArrowUp} style={styles.icon} size={30} />
+                        </TouchableOpacity>
+                    ): (
+                        <TouchableOpacity style={styles.iconContainer} onPress={onGenerate}>
+                            <FontAwesomeIcon icon={faArrowsRotate} style={styles.icon} size={30} />
                         </TouchableOpacity>
                     )}
                 </View>

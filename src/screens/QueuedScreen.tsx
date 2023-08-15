@@ -317,7 +317,11 @@ const QueuedScreen = () => {
       console.log("userImageResult: ", userImageResult.data);
       const userImageJson = userImageResult.data;
       console.log("userImageJson.status: ", userImageJson.status);
-      setQueued(userImageJson.status);
+      // setQueued(userImageJson.status);
+
+      if (!userImageJson.success) {
+        setQueued(false);
+      }
 
       if (userImageJson.status) {
         show();

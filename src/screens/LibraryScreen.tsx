@@ -197,7 +197,7 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
       <View style={[styles.container, { height: dimensions.screenHeight, width: dimensions.screenWidth }]}>
         <>
           {loading && <TxtBanner top={dimensions.screenHeight / 2 - 25}>Loading...</TxtBanner>}
-          {!loading && upscaling && <TxtBanner top={dimensions.screenHeight / 2 - 50}>Upscaling Images...</TxtBanner>}
+          {!loading && upscaling && <TxtBanner top={(dimensions.screenHeight / 3) * 2}>Upscaling Images...</TxtBanner>}
           {error && <TxtBanner>Error loading images</TxtBanner>}
           {error && <Btn overlay onPress={() => fetchPage(page)}>Retry</Btn>}
           {image && 
