@@ -174,7 +174,7 @@ const PhotoScreen = () => {
         </View>
 
         <View style={[styles.disclaimerWrap, { top: (dimensions.screenHeight * 8) / 10, width: dimensions.screenWidth }]}>
-          <Txt size={Size.S} style={[styles.disclaimer]}>Generated faces and images are may not look like the face in the source image. All images are provided "as-is" for entertainment purposes.</Txt>
+          <Txt size={Size.S} style={[styles.disclaimer]}>Generated faces and images are may not look like the face the original image. All images are provided "as-is" for entertainment purposes.</Txt>
         </View>
     </View>
   );

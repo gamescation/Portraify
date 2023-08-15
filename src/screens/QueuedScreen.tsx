@@ -317,16 +317,13 @@ const QueuedScreen = () => {
       console.log("userImageResult: ", userImageResult.data);
       const userImageJson = userImageResult.data;
       console.log("userImageJson.status: ", userImageJson.status);
-      // setQueued(userImageJson.status);
-
-      if (!userImageJson.success) {
-        setQueued(false);
-      }
 
       if (userImageJson.status) {
+        setQueued(true);
         show();
       } else {
         setSubscribed(false);
+        setQueued(false);
       }
     } catch(e) {
       console.error(`Error queueing: ${e.message} ${e.stack}`);
