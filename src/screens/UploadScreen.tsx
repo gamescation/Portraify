@@ -88,36 +88,40 @@ const UploadScreen = () => {
         }
       });
       const json = await result.json();
+      
       const {secure_url} = json;
-      console.log("secure_url: ", secure_url);
-
-      const uploaded = await makeRequest({
-        body: {
-          secure_url
-        }
-      })
-
-      console.log("Uploaded: ", uploaded);
-      if (uploaded.success) {
-        console.log("Setting imageUploaded", uploaded.id);
-        AsyncStorage.setItem('imageUploaded', JSON.stringify({
-          id: uploaded.id,
-          secure_url,
-          queued: true
-        }));
-
-        AsyncStorage.setItem('hasImages', 'true');
-      } else {
-        setError(true);
-        return;
-      }
 
       if (secure_url) {
-        console.log("image uploaded: ", secure_url);
-        console.log("channel_id:", channel_id);
-        console.log("uploaded.id: ", uploaded.id);
-        
-        navigation.replace('Queued', { image: secure_url, imageId: uploaded.id, channel_id });
+        console.log("secure_url: ", secure_url);
+
+        const uploaded = await makeRequest({
+          body: {
+            secure_url
+          }
+        })
+
+        console.log("Uploaded: ", uploaded);
+        if (uploaded.success) {
+          console.log("Setting imageUploaded", uploaded.id);
+          AsyncStorage.setItem('imageUploaded', JSON.stringify({
+            id: uploaded.id,
+            secure_url,
+            queued: true
+          }));
+
+          AsyncStorage.setItem('hasImages', 'true');
+        } else {
+          setError(true);
+          return;
+        }
+
+        if (secure_url) {
+          console.log("image uploaded: ", secure_url);
+          console.log("channel_id:", channel_id);
+          console.log("uploaded.id: ", uploaded.id);
+          
+          navigation.replace('Queued', { image: secure_url, imageId: uploaded.id, channel_id });
+        }
       }
     } catch (error) {
       console.log('Error uploading to Cloudinary:', error.message, error.stack);

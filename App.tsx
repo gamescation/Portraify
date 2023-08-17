@@ -52,5 +52,4 @@ function App(): JSX.Element {
   );
 }
 
-const codePushOptions = { deploymentKey: 'x-M0k4Ngf1kiSfJXHaeimbCkMi3RVXJFv9v6x', checkFrequency: codePush.CheckFrequency.ON_APP_RESUME };
-export default __DEV__ ? App: codePush(codePushOptions, App);
+export default __DEV__ ? App: codePush(App);

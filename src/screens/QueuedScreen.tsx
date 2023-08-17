@@ -20,16 +20,18 @@ import { makeRequest } from '../api/images/image-queue';
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 50
+    position: 'absolute',
+    left: 0,
+    width: '100%',
+    backgroundColor: '#000',
+    alignItems: 'center'
   },
   queuedText: {
     color: "white",
     textTransform: 'uppercase',
     fontWeight: '800',
-    paddingVertical: 2
+    paddingVertical: 2,
+    textAlign: 'center'
   },
   queuedTextWrapper: {
     position: 'absolute',
@@ -42,6 +44,8 @@ const styles = StyleSheet.create({
   },
   image: {
     position: 'absolute',
+    left: 0,
+    right: 0
   },
   sliderRow: {
     alignSelf: 'stretch',
@@ -49,7 +53,10 @@ const styles = StyleSheet.create({
   },
   btnWrapper: {
     flexDirection: 'row',
-    marginTop: 10
+    marginTop: 10,
+    width: '100%',
+    paddingHorizontal: 30,
+    justifyContent: 'space-between'
   },
   interstitial: {
     position: 'absolute',
@@ -71,7 +78,7 @@ const styles = StyleSheet.create({
   },
   selectorContainer: {
     paddingTop: 15,
-    width: '100%',
+    width: '80%',
     marginTop: 15,
     opacity: 0.9,
   },
@@ -79,10 +86,10 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     top: 0,
     alignItems: 'center',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    width: '100%'
   },
-  btn: {
-  },
+  btn: {width: 150},
   startBtnOverlay: {
     backgroundColor: 'orange'
   },
@@ -158,64 +165,29 @@ const typeList = [
   "Mosaic"
 ]
 
+const startTime = `45`;
+
 const QueuedScreen = () => {
   const [queued, setQueued] = useState(false);
   const route = useRoute();
   const params = route.params || {};
   const { image: paramsImage, channel_id, previouslyQueued, imageId: paramsImageId } = params;
-
   const [image] = useState(paramsImage || (previouslyQueued ? previouslyQueued.secure_url: ''));
-  const [subscribed, setSubscribed] = useState(false);
-  const [progress, setProgress] = useState('0%');
+  const [subscribed] = useState(false);
+  const [progress, setProgress] = useState(startTime);
   const { dimensions } = getDimensionsAndOrientation();
   const [gender, setGender] = useState('');
+  const [startTimer, setStartTimer] = useState(false);
   const [background, setBackground] = useState('Office');
   const [type, setType] = useState('Headshot');
-  const [ newImageUri, setImageUri ] = useState('');
   const navigation = useNavigation();
-  const [hasSeenAd, setHasSeenAd] = useState(false);
-  const [imageId, setImageId] = useState(paramsImageId || previouslyQueued.id);
-  const [disconnected, setDisconnected] = useState(false);
+  const [imageId] = useState(paramsImageId || previouslyQueued.id);
 
   const adToServe = getPlacement('admob', 'interstitial');
   const adUnitId = __DEV__ ? TestIds.INTERSTITIAL: adToServe;
-  const { isLoaded, isClosed, load, show } = useInterstitialAd(adUnitId, {
+  const { load, show } = useInterstitialAd(adUnitId, {
     requestNonPersonalizedAdsOnly: true,
   });
-
-  const checkForUpdate = useCallback(async() => {
-      try { 
-        const result = await makeRequest({ body: {
-          imageId: imageId || previouslyQueued.id
-        } });
-
-        if (result) {
-          if (result.generating) {
-            if (result.progress) {
-              setProgress(result.progress);
-            }
-          } else if (result.complete) {
-            setProgress('100%');
-            const secure_url = result.secure_url;
-            setImageUri(secure_url);
-            setImageId(result.id);
-            console.log('secure_url: ', secure_url);
-            if (hasSeenAd || !isLoaded) {
-              return navigation.replace('ImageSelection', { secure_url, imageId: result.id, channel_id });
-            }
-          }
-        }
-      } catch(e) {
-        console.error(`Error while checking for an update ${e.message} ${e.stack}`);
-      }
-  }, [hasSeenAd, isLoaded, navigation, channel_id, imageId]);
-
-  const checkOnInterval = useCallback(() => {
-    return setInterval(async() => {
-      console.log("Checking for an update");
-      await checkForUpdate();
-    }, 60000);
-  }, []);
 
   useEffect(() => {
     // Start loading the interstitial straight away
@@ -223,117 +195,80 @@ const QueuedScreen = () => {
   }, [load]);
 
   useEffect(() => {
-    if (isClosed) {
-      // Action after the ad is closed
-      setHasSeenAd(true);
-      if (parseInt(progress) >= 100 && newImageUri && imageId) {
-        navigation.replace('ImageSelection', { secure_url: newImageUri, imageId, channel_id });
-      }
-    }
-  }, [isClosed, navigation, progress, newImageUri, imageId, channel_id]);
-
-
-  useEffect(() => {
-    if (subscribed || previouslyQueued) {
-      if(previouslyQueued) {
-        checkForUpdate();
-      }
-
-      const interval = checkOnInterval();
-
-      return () => {
-        if (interval) {
-          clearInterval(interval);
-        }
-      }
-    }
-  }, [subscribed, previouslyQueued]);
-
-  const subscribeToChannel = useCallback(() => {
-    if (!subscribed) {
-      setSubscribed(true);
-      if (channel_id) {
-        console.log("Subscribed to channel_id", channel_id);
-        subscribe(channel_id, (data) => {
-          const message = data.message;
-          console.log("Progress: ", message?.progress);
-          const prog = parseInt(message?.progress) || 0;
-          if (prog < 100) {
-            setProgress(message?.progress || 0);
-          } else if (prog >= 100) {
-            console.log("Complete");
-            const secure_url = message?.secure_url;
-            console.log("imageUri: ", secure_url);
-            setImageUri(secure_url);
-            setProgress(message?.progress); 
-            setImageId(message?.id)
-            if (hasSeenAd || !isLoaded) {
-              console.log('secure_url: ', secure_url);
-              navigation.replace('ImageSelection', { secure_url, imageId: message?.id, channel_id });
-            }
-          }
-        });
-      }
-    }
-  }, [subscribed, channel_id, navigation, isLoaded, hasSeenAd]);
-
-  useEffect(() => {
-    if (disconnected) {
-      setDisconnected(false);
-      subscribeToChannel();
-    }
-    return () => {
-      if (subscribed) {
-        unsubscribe(channel_id);
-        setSubscribed(false);
-        setDisconnected(true)
-      }
-    }
-  }, [channel_id, subscribed, disconnected]);
-
-  useEffect(() => {
     AsyncStorage.getItem('gender', (error, result) => {
         if (result) {
             setGender(result);
         }
     })
-}, []);
+  }, []);
 
+  useEffect(() => {
+    if (startTimer) {
+      const interval = setInterval(() => {
+        if (parseInt(progress) - 1 > 0) {
+          setProgress(`${parseInt(progress) - 1}`)
+        } else {
+          setProgress(startTime);
+        }
+      }, 1000);
+
+      return () => {
+        clearInterval(interval);
+      }
+    }
+  }, [progress, startTimer])
 
   const enqueue = useCallback(async() => {
     console.log("sending secure_url: ", image);
-    setQueued(true);
-    try { 
-      subscribeToChannel();
-      const t = await AsyncStorage.getItem('t');
 
-      console.log(`Sending ${gender} ${background} ${type}`)
-      const userImageResult = await axios.post(`${imageQueueUrl}`, {
-        t,
-        secure_url: image,
-        imageId,
-        data: {
-          gender,
-          background,
-          type
-        }
-      });
-      console.log("userImageResult: ", userImageResult.data);
-      const userImageJson = userImageResult.data;
-      console.log("userImageJson.status: ", userImageJson.status, userImageJson.success);
-
-      if (userImageJson.success) {
-        setQueued(true);
+    if (!queued) {
+      try { 
         show();
-      } else {
-        setSubscribed(false);
-        setQueued(false);
+      } catch(e) {
+        // do nothing
       }
-    } catch(e) {
-      console.error(`Error queueing: ${e.message} ${e.stack}`);
-      setQueued(false);
+  
+      setQueued(true);
+      try { 
+
+        const t = await AsyncStorage.getItem('t');
+
+        // console.log(`Sending ${gender} ${background} ${type}`)
+        setProgress(startTime)
+        setStartTimer(true);
+        const userImageResult = await axios.post(`${imageQueueUrl}`, {
+          t,
+          secure_url: image,
+          imageId,
+          data: {
+            gender,
+            background,
+            type
+          }
+        });
+        // console.log("userImageResult: ", userImageResult.data);
+        const userImageJson = userImageResult.data;
+        console.log("userImageJson.image: ", userImageJson.image);
+
+        if (userImageJson.success) {
+          if (userImageJson.image) {
+            const { secure_url } = userImageJson.image;
+            if (secure_url) {
+              console.log("imageId: ", userImageJson?.image.id);
+              navigation.replace('ImageSelection', { secure_url, imageId: userImageJson?.image.id, channel_id });
+            }
+          } 
+        } else {
+          setQueued(false);
+          setStartTimer(false);
+        }
+      } catch(e) {
+        console.error(`Error queueing: ${e.message} ${e.stack}`);
+        setQueued(false);
+        setStartTimer(false);
+      }
     }
-  }, [image, gender, background, type, imageId]);
+  }, [queued, subscribed, image, gender, background, type, imageId]);
 
   const cancel = useCallback(async() => {
     await AsyncStorage.removeItem('imageUploaded');
@@ -352,53 +287,45 @@ const QueuedScreen = () => {
   const smallScreen = dimensions.screenHeight < 700;
   return (
     <View style={styles.container}>
-        <>
-          {image && <Image style={styles.image} source={{ uri: image }} height={dimensions.screenHeight} width={dimensions.screenWidth} />}
-          {queued && (<View style={[styles.queuedTextWrapper, { top: smallScreen ? 5: dimensions.screenHeight / 7 }]}>
-            {parseInt(progress) > 0 ?
-            <>
+      {image && <Image style={styles.image} source={{ uri: image }} height={dimensions.screenHeight} width={dimensions.screenWidth} />}
+          {queued && (<View style={[styles.queuedTextWrapper, { top: smallScreen ? 5: dimensions.screenHeight / 7 }, { width: dimensions.screenWidth}]}>
+            <View>
               <Txt style={styles.queuedText}>Creating Your Images</Txt>
               <Txt style={styles.queuedText}>{progress}</Txt>
-            </>:
-            <>
-              <Txt style={styles.queuedText}>In Line</Txt>
-              <Txt style={styles.queuedText}>Creating other headshots</Txt>
-              <Txt style={styles.queuedText}>Please wait</Txt>
-            </>}
+            </View>
             <InLine wrapperStyle={{top: dimensions.screenHeight - 550}} />
           </View>)}
+          <View style={{ position: 'absolute', width: dimensions.screenWidth, left: 0 }}>
+            {!queued && (
+              <View style={styles.inputContainer}>
+                <View style={[styles.selectorContainer, {top: 0}, smallScreen && styles.selectorContainerSmallScreen]}>
+                  <MaleFemaleSelector onSelect={setGender} />
+                </View>
+                <View style={[styles.selectorContainer, smallScreen && styles.selectorContainerSmallScreen]}>
+                  <View style={styles.typeOverlay}></View>
+                  <Txt style={[styles.label, smallScreen && { fontSize: 8, marginTop: 2}]}>Background</Txt>
+                  <View style={[smallScreen && { maxHeight: 175}]}>
+                    <TypeSelector type="background"  onSelect={setBackground} types={backgrounds} defaultValue='Office' />
+                  </View>
+                </View>
+                <View style={[styles.selectorContainer]}>
+                  <View style={styles.typeOverlay}></View>
+                  <Txt style={[styles.label, smallScreen && { fontSize: 8, marginTop: 2}]}>Portrait Type</Txt>
+                  <View style={[smallScreen && { maxHeight: 170 }]}>
+                    <TypeSelector type="types" onSelect={setType} types={types} defaultValue='Portrait' />
+                  </View>
+                </View>
 
-          {!queued && 
-          (
-            <View style={styles.inputContainer}>
-              <View style={[styles.selectorContainer, {top: 0}, smallScreen && styles.selectorContainerSmallScreen]}>
-                <MaleFemaleSelector onSelect={setGender} />
-              </View>
-              <View style={[styles.selectorContainer, smallScreen && styles.selectorContainerSmallScreen]}>
-                <View style={styles.typeOverlay}></View>
-                <Txt style={[styles.label, smallScreen && { fontSize: 8, marginTop: 2}]}>Background</Txt>
-                <View style={[smallScreen && { maxHeight: 175}]}>
-                  <TypeSelector type="background"  onSelect={setBackground} types={backgrounds} defaultValue='Office' />
+                <View style={[styles.btnWrapper]}>
+                  <Btn btnStyle={{ width: dimensions.screenWidth / 2 - 30}} overlay onPress={cancel}>Cancel</Btn>
+                  <Btn btnStyle={{ width: dimensions.screenWidth / 2 - 30}}  overlay onPress={enqueue} overlayStyle={styles.startBtnOverlay}>Next</Btn>
                 </View>
               </View>
-              <View style={[styles.selectorContainer]}>
-                <View style={styles.typeOverlay}></View>
-                <Txt style={[styles.label, smallScreen && { fontSize: 8, marginTop: 2}]}>Portrait Type</Txt>
-                <View style={[smallScreen && { maxHeight: 170}]}>
-                  <TypeSelector type="types" onSelect={setType} types={types} defaultValue='Portrait' />
-                </View>
-              </View>
-
-              <View style={[styles.btnWrapper]}>
-                <Btn overlay onPress={cancel} style={{width: dimensions.screenWidth / 2.5, left: -5}}>Cancel</Btn>
-                <Btn overlay onPress={enqueue} style={{width: dimensions.screenWidth / 2.5, right: -5}} overlayStyle={styles.startBtnOverlay}>Next</Btn>
-              </View>
-            </View>
-          )}
+            )}
+          </View>
           
 
-          {!queued && <Banner />}
-        </>
+          {!queued && !subscribed && <Banner />}
     </View>
   );
 };

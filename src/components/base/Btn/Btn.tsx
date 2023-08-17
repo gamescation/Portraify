@@ -1,5 +1,5 @@
 import { secondaryFont } from "../../../constants/fonts";
-import { Animated, ButtonProps, ImageBackground, StyleProp, StyleSheet, TextProps, TouchableOpacity, TouchableOpacityProps, View } from "react-native";
+import { Animated, ButtonProps, ImageBackground, StyleProp, StyleSheet, TextProps, TouchableOpacity, TouchableOpacityProps, View, ViewProps } from "react-native";
 import { Size, Txt } from "../Txt";
 import { accentColor, primaryColor, secondaryColor } from "../../../constants/colors";
 import { Space } from "../Spacing/Space";
@@ -46,6 +46,10 @@ interface BtnProps extends TouchableOpacityProps {
     size?: Size
     outline?: boolean
     overlay?: boolean
+    btnStyle: ViewProps
+    textStyle: TextProps
+    wrapperStyle: ViewProps
+    overlayStyle: ViewProps
 }
 
 const ANIMATION_DURATION = 1000;
@@ -62,10 +66,10 @@ export function Btn(props?: BtnProps): JSX.Element {
     }, [fadeAnim]);
 
     return (
-        <Animated.View style={[{ opacity: fadeAnim }, props?.style ? props.style: null]}>
-            <TouchableOpacity {...props} style={[styles.btn, props?.style]}>
-                <Txt style={styles.txt} size={props?.size}>{props?.children || DEFAULT_TITLE}</Txt>
-                {props?.overlay && <View style={[styles.overlay, props.overlayStyle, props?.style?.width ? { width: (props?.style?.width || 200) - 25 } : {}]}></View>}
+        <Animated.View style={[{ opacity: fadeAnim }, props?.wrapperStyle ? props.wrapperStyle: null]}>
+            <TouchableOpacity {...props} style={[styles.btn, props?.btnStyle]}>
+                <Txt style={[styles.txt, props?.textStyle]} size={props?.size}>{props?.children || DEFAULT_TITLE}</Txt>
+                {props?.overlay && <View style={[styles.overlay, props?.overlayStyle, props?.btnStyle?.width ? { width: (props?.btnStyle?.width || 200) - 25 } : {}]}></View>}
             </TouchableOpacity>
         </Animated.View>
     )

@@ -7,8 +7,6 @@ const styles = StyleSheet.create({
     flex: {
         backgroundColor: 'black',
         flex: 1,
-        alignContent: 'center',
-        justifyContent: 'center'
     },
     logo: {
         position: 'absolute',
@@ -22,6 +20,9 @@ const styles = StyleSheet.create({
     },
     splash: {
         ...StyleSheet.absoluteFillObject,
+    },
+    errorContainer: {
+        paddingTop: 120
     }
 })
 
@@ -33,7 +34,7 @@ export function SplashScreen({ error = '' }: { error?: string }): JSX.Element {
             <Image source={splash} style={[styles.splash, { width: dimensions.screenWidth, height: dimensions.screenHeight}]} />
 
             {error && (
-                <View>
+                <View style={styles.errorContainer}>
                     <Text style={styles.error}>{error}</Text>
                     <Text style={styles.error}>Retrying...</Text>
                 </View>)}

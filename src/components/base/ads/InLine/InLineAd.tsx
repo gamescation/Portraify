@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { getTrackingStatus } from "react-native-tracking-transparency";
 
 
-export function InLine({ wrapperStyle }): JSX.Element {
+export function InLine({ wrapperStyle = {} }): JSX.Element {
     const adToServe = getPlacement('admob', 'queuedpage');
     const adUnitId = __DEV__ ? TestIds.BANNER: adToServe;
     const height = 400;

@@ -41,11 +41,11 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Take portrait photos and headshots.</string>
+	<string>Portraify uses the camera to take photos, then uploading for AI generation of images your photo.  The original and generated images are then savable, viewable, and shareable within your library.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Upload portrait photos and headshots.</string>
+	<string>Portraify will use only the images you select from your photo library. It will then upload those images for AI generation of images based on your selection.  The original and generated images are then savable, viewable, and shareable within your library.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>FontAwesome</string>

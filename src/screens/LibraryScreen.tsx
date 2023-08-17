@@ -7,8 +7,8 @@ import { makeRequest } from '../api/user/images';
 import { Btn } from '../components/base/Btn';
 import { Banner } from '../components/base/ads/Banner';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { subscribe, unsubscribe } from '../hooks/pusher';
 import LibraryImage from '../components/images/LibraryImage';
+import { FadeView } from '../components/base/FadeView';
 
 
 const HEIGHT = 150;
@@ -76,27 +76,21 @@ const map = (data: any[], options = { key: 'id' }) => {
 }
 
 const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
-  const [images, setImages] = useState({});
+  const [images, setImages] = useState([]);
   const [image, setImage] = useState();
-  const [subscribed, setSubscribed] = useState(false);
-  const [channel_id, setChannel] = useState();
   const { dimensions } = getDimensionsAndOrientation();
   const [loading, setLoading] = useState(false);
+  const [loadedFirstTime, setLoadedFirstTime] = useState(false);
   const [page, setPage] = useState(1);
   const [error, setError] = useState(false);
   const navigation = useNavigation();
-  const route = useRoute();
-  const [upscaling, setUpscaling] = useState(route.params?.upscale);
 
   const fetchPage = useCallback(function(page: number) {
     setLoading(true);
     makeRequest({ page, pageSize: 10 })
       .then((results) => {
+        setLoadedFirstTime(true);
         const len = results?.images?.length;
-
-        if (results?.channel_id) {
-          setChannel(results?.channel_id);
-        }
 
         if (len === 0 && !Object.keys(images).length) {
           return navigation.reset({ 
@@ -107,16 +101,22 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
         
         if (len > 0) {
           const mappedResults = map(results.images);
+          const mappedImages = map(images);
           const newImages = {
             ...mappedResults,
-            ...images,
+            ...mappedImages,
           }
 
-          setImages(newImages);
+          const sortedImages = Object.values(newImages).sort((a:any, b: any) => { 
+            return a.createdAt > b.createdAt ? 1: -1;
+          });
+
+          setImages(sortedImages);
+
           setPage(page + 1);
 
-          if (!image && Object.values(newImages).length) {
-            const first = Object.values(newImages)[0];
+          if (!image && sortedImages.length) {
+            const first = sortedImages[0];
             setImage(first);
             onLoad();
           } else if (!images && Object.values(newImages).length === 0) {
@@ -134,55 +134,15 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
       .finally(() => {
         setLoading(false);
       })
-  }, [image, navigation, upscaling, images]);
+  }, [image, navigation, images]);
 
   const selectImage = useCallback((image) => {
     setImage(image);
   }, [images])
 
-  const subscribeToChannel = useCallback(() => {
-    if (!subscribed && channel_id) {
-      setSubscribed(true);
-      console.log("Subscribed to channel_id", channel_id);
-      subscribe(channel_id, (data) => {
-        const message = data.message;
-        console.log("Upscaled: ", message);
-        navigation.setParams({
-          upscale: false
-        })
-
-        setUpscaling(false);
-        setImages({
-          ...images,
-          [message?.id]: {
-            secure_url: message.secure_url,
-            id: message?.id,
-            generated: true
-          },
-        })
-      });
-    }
-  }, [navigation, subscribed, channel_id, images]);
-
   useEffect(() => {
     fetchPage(page);
   }, []);
-
-  useEffect(() => {
-    if (route.params?.connect && channel_id) {
-      console.log("Attempting to connect");
-      subscribeToChannel();
-    }
-  }, [channel_id, route]);
-
-  useEffect(() => {
-    return () => {
-      if (subscribed && channel_id) {
-        unsubscribe(channel_id);
-        setSubscribed(false);
-      }
-    }
-  }, [channel_id, subscribed]);
 
   const flatlistStyle = StyleSheet.create({
     flatlist: {
@@ -191,20 +151,16 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
     }
   });
 
-  const values = useMemo(() => Object.values(images), [images]);
-
   return (
-      <View style={[styles.container, { height: dimensions.screenHeight, width: dimensions.screenWidth }]}>
+      <FadeView loaded={loadedFirstTime} style={[styles.container, { height: dimensions.screenHeight, width: dimensions.screenWidth }]}>
         <>
-          {loading && <TxtBanner top={dimensions.screenHeight / 2 - 25}>Loading...</TxtBanner>}
-          {!loading && upscaling && <TxtBanner top={(dimensions.screenHeight / 3) * 2}>Upscaling Images...</TxtBanner>}
           {error && <TxtBanner>Error loading images</TxtBanner>}
           {error && <Btn overlay onPress={() => fetchPage(page)}>Retry</Btn>}
           {image && 
             <LibraryImage image={image} />}
         </>
 
-        {values.length > 0 && (
+        {images.length > 0 && (
           <View style={[styles.flatlistWrapper, { width: dimensions.screenWidth }]}>
             <View style={styles.addWrapper}>
               <TouchableOpacity style={styles.add} onPress={() => {
@@ -213,7 +169,7 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
                 })
               }}><Txt style={styles.addBtn}>+</Txt></TouchableOpacity>
             </View>
-            <FlatList horizontal data={values} style={[styles.flatlist, flatlistStyle.flatlist]} 
+            <FlatList horizontal data={images} style={[styles.flatlist, flatlistStyle.flatlist]} 
               onEndReached={() => fetchPage(page)} 
               renderItem={({ item, index }) => {
                 return (
@@ -226,7 +182,7 @@ const LibraryScreen = ({ onLoad = () => {} }: { onLoad: () => void }) => {
           </View>
         )} 
         <Banner />
-      </View>
+      </FadeView>
 
   );
 };
